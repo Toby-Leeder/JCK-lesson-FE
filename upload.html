@@ -1,30 +1,105 @@
 <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <style>
+    body {
+      background-color: #282c34; 
+    }
+
+    #form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 20vh; 
+    }
+
+    #file {
+      background-color: #00ced1; 
+      color: #fff; 
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      margin: 10px;
+      cursor: pointer;
+    }
+
+    #submit {
+      background-color: #00ced1; 
+      color: #fff; 
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      margin: 10px;
+      cursor: pointer;
+    }
+
+    #image {
+      margin: 50px auto; 
+      background-size: cover;
+      background-position: center center;
+      height: 50%;
+      width: 50%;
+    }
+  </style>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 </head>
 
-<form id="form">
+<body>
+  <form id="form">
     <input id="file" type="file">
     <input id="submit" type="submit">
-</form>
+  </form>
 
-<div style="height:50%; width:50%;" id="image"></div>
+  <div style="height:50%; width:50%;" id="image"></div>
 
-<script>
-    const form = document.getElementById("form")
+  <script>
+    const form = document.getElementById("form");
     const fileReader = new FileReader();
 
+    form.onsubmit = async function(event) {
+      event.preventDefault();
+      const myFile = await $("#file").prop("files")[0];
 
-    form.onsubmit = async function(){
-        event.preventDefault();
-        var myFile = await $('#file').prop('files')[0];
+      fileReader.onload = function() {
+        const image = btoa(fileReader.result);
+        console.log(image);
+        document.getElementById(
+          "image"
+        ).style = `background-image: url('data:image/png;base64, ${image}'); height:50%; width:50%;`;
 
-        fileReader.onload=function(){
-            var image = btoa(fileReader.result)
-            console.log(image)
-            document.getElementById("image").style = "background-image: url('data:image/png;base64, " + image.toString() +"'); height:50%; width:50%;"
-        }
+        $.ajax({
+          type: "POST",
+          url: "http://127.0.0.1:8199/api/image/",
+          data: {
+            image: image,
+          },
+          success: function(response) {
+            console.log(response);
+          },
+          error: function(jqXHR, textStatus, errorThrown) {
+            console.log(textStatus, errorThrown);
+          },
+        });
+      };
 
-        fileReader.readAsBinaryString(myFile)
+      fileReader.readAsBinaryString(myFile);
+    };
 
-    }
-</script>
+    // $.ajax({
+    //           type: "GET",
+    //           url: "http://127.0.0.1:8199/api/image/",
+    //           success: function(response) {
+    //             console.log(response);
+    //             const imageData = response.data;
+    //             document.getElementById(
+    //               "image"
+    //             ).style = `background-image: url('data:image/png;base64, ${imageData}'); height:50%; width:50%;`;
+    //           },
+    //           error: function(jqXHR, textStatus, errorThrown) {
+    //             console.log(textStatus, errorThrown);
+    //           },
+    //         });
+    //       },
+    //       error: function(jqXHR, textStatus, errorThrown) {
+    //         console.log(textStatus, errorThrown);
+  </script>
+</body>
