@@ -1,0 +1,30 @@
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+</head>
+
+<form id="form">
+    <input id="file" type="file">
+    <input id="submit" type="submit">
+</form>
+
+<div style="height:50%; width:50%;" id="image"></div>
+
+<script>
+    const form = document.getElementById("form")
+    const fileReader = new FileReader();
+
+
+    form.onsubmit = async function(){
+        event.preventDefault();
+        var myFile = await $('#file').prop('files')[0];
+
+        fileReader.onload=function(){
+            var image = btoa(fileReader.result)
+            console.log(image)
+            document.getElementById("image").style = "background-image: url('data:image/png;base64, " + image.toString() +"'); height:50%; width:50%;"
+        }
+
+        fileReader.readAsBinaryString(myFile)
+
+    }
+</script>
