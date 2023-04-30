@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JCK | Full Stack Hacks</title>
+    <style>
+        ::selection {
+            background: #c2e17f;
+            color: rgb(42, 42, 42);
+        }
+        body {
+            background-color: #f9f9ed;
+            font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+        }
+        h1 {
+            color: #4f5d86;
+            font-size: 40pt;
+            margin: 0px;
+            padding: 0px;
+            text-align: center;
+            margin-top: 40px;
+        }
+        table.board {
+            font-size: 13pt;
+            border-collapse: collapse;
+            margin: 25px 0;
+            margin-top: 40px;
+            width: 90%;
+        }
+
+        .board thead tr, tbody tr{
+            font-size: 22pt;
+            font-weight: bolder;
+            background-color: #dbf4a7;
+            text-align: left;
+        }
+        .board tbody tr {
+            font-size: 15pt;
+        }
+        .board td {
+            width: 33.3333%;
+            text-align: center;
+            padding: 12px 15px;
+            border: none;
+            height: 50px;
+        }
+        .board tbody tr {
+            border: none;
+            transition-duration: 0.2s;
+        }
+        .board tbody tr:nth-of-type(even) {
+            background-color: #d9dbf1;
+        }
+        .board tbody tr:nth-of-type(odd) {
+            background-color: #8e9dcc;
+        }
+        .board tbody tr:last-of-type td:first-of-type {
+            border-bottom-left-radius: 30px;
+        }
+        .board tbody tr:last-of-type td:last-of-type {
+            border-bottom-right-radius: 30px;
+        }
+        .board tbody tr:hover {
+            color: #f9f9ed;
+            background-color: #707fac;
+        }
+        .board thead tr td:last-of-type {
+            border-top-right-radius: 30px;
+        }
+        .board thead tr td:first-of-type {
+            border-top-left-radius: 30px;
+        }
+        #container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+    <h1>JCK Table</h1>
+    <table class="board">
+        <thead>
+            <td>Rank</td>
+            <td>Name</td>
+            <td>Tokens</td>
+        </thead>
+        <tbody id='tbody'>
+        </tbody>
+    </table>
+    </div>
+</body>
+<script>
+    var tbody = document.getElementById('tbody');
+    let databaseReturn = null;
+    function tableFill(db) {
+        let len = db.length
+        for (var i = 0; i < len; i++) {
+            // save relevant info from db
+            var rank = i+1
+            var name = db[i][0]
+            var tokens = db[i][1]
+            // Make a new row
+            let tr = document.createElement('tr')
+            tbody.appendChild(tr)
+            // Make three entries for the row
+            let tdR = document.createElement('td')
+            let tdN = document.createElement('td')
+            let tdT = document.createElement('td')
+            // Make text node for each entry (contains data from db)
+            let rankNode = document.createTextNode(parseFloat(rank))
+            let nameNode = document.createTextNode(name)
+            let tokensNode = document.createTextNode(parseFloat(tokens))
+            // Make text nodes visible in row entries
+            tdR.appendChild(rankNode)
+            tdN.appendChild(nameNode)
+            tdT.appendChild(tokensNode)
+            // Make row entries visible in the row
+            tr.appendChild(tdR)
+            tr.appendChild(tdN)
+            tr.appendChild(tdT)
+        }
+    }
+    async function getData() {
+        const sorted = await fetch('http://172.27.8.69:8199/api/players/sort')
+            .then(res => {return res.json()})
+            .then(data => {tableFill(data)})
+            .catch(error => console.log('ERROR'))
+    }
+    getData()
+</script>
+</html>
