@@ -78,10 +78,27 @@
             justify-content: center;
             align-items: center;
         }
+        button {
+            margin-top: 5vh;
+            border: none;
+            outline: none;
+            background-color: #dbf4a7;
+            height: 60px;
+            font-weight: bold;
+            font-size: 15px;
+            width: 150px;
+            border-radius: 10px;
+            transition-duration: 0.3s;
+        }
+        button:hover {
+            background-color: #8e9dcc;
+            color: #f9f9ed;
+        }
     </style>
 </head>
 <body>
     <div id="container">
+    <button onclick="window.location.href = 'http://127.0.0.1:5500/JCK-lesson-FE/upload.html';">See images</button>
     <h1>JCK Table</h1>
     <table class="board">
         <thead>
@@ -93,6 +110,7 @@
         </tbody>
     </table>
     </div>
+
 </body>
 <script>
     var tbody = document.getElementById('tbody');
@@ -126,7 +144,7 @@
         }
     }
     async function getData() {
-        const sorted = await fetch('http://172.27.8.69:8199/api/players/sort')
+        const sorted = await fetch('http://172.27.12.252:8199/api/players/sort')
             .then(res => {return res.json()})
             .then(data => {tableFill(data)})
             .catch(error => console.log('ERROR'))
