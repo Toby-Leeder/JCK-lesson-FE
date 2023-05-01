@@ -2,6 +2,9 @@
   <style>
     body {
       background-color: #282c34; 
+      display: flex;
+      align-items:center;
+      flex-direction:column;
     }
 
     #form {
@@ -32,7 +35,16 @@
       cursor: pointer;
     }
 
-    #image {
+    #name {
+      background-color: #00ced1; 
+      color: #fff; 
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      margin: 10px;
+    }
+
+    button {
       margin: 50px auto; 
       background-size: cover;
       background-position: center center;
@@ -45,61 +57,79 @@
 
 <body>
   <form id="form">
+    <input id="name" type="text" placeholder="Name" >
     <input id="file" type="file">
     <input id="submit" type="submit">
   </form>
+  <button id="button" class="button">Click to see the images on the backend</button>
 
   <div style="height:50%; width:50%;" id="image"></div>
 
   <script>
+    var url = "http://172.27.8.69:8199/api/image"
     const form = document.getElementById("form");
     const fileReader = new FileReader();
 
     form.onsubmit = async function(event) {
       event.preventDefault();
-      const myFile = await $("#file").prop("files")[0];
+      var myFile = await $("#file").prop("files")[0];
 
       fileReader.onload = function() {
-        const image = btoa(fileReader.result);
+        var image = btoa(fileReader.result);
         console.log(image);
-        document.getElementById(
-          "image"
-        ).style = `background-image: url('data:image/png;base64, ${image}'); height:50%; width:50%;`;
+        
+        var message = {
+            "name": document.getElementById("name").value,
+            "data" : image
+        }
 
-        $.ajax({
-          type: "POST",
-          url: "http://127.0.0.1:8199/api/image/",
-          data: {
-            image: image,
-          },
-          success: function(response) {
-            console.log(response);
-          },
-          error: function(jqXHR, textStatus, errorThrown) {
-            console.log(textStatus, errorThrown);
-          },
-        });
+        console.log(message)
+        var postOptions = {
+           method : 'POST',
+           body : message,
+           headers : {
+            "Content-Type" : "application/json"
+           }
+        }
+        fetch(url + '/', postOptions)
+        .then(response => {
+           if (response.status !== 200) {
+           console.log(errorMsg);
+           return;
+           }
+           response.json().then(data => {
+           console.log(data)
+           })
+        })
+        
       };
 
       fileReader.readAsBinaryString(myFile);
     };
 
-    // $.ajax({
-    //           type: "GET",
-    //           url: "http://127.0.0.1:8199/api/image/",
-    //           success: function(response) {
-    //             console.log(response);
-    //             const imageData = response.data;
-    //             document.getElementById(
-    //               "image"
-    //             ).style = `background-image: url('data:image/png;base64, ${imageData}'); height:50%; width:50%;`;
-    //           },
-    //           error: function(jqXHR, textStatus, errorThrown) {
-    //             console.log(textStatus, errorThrown);
-    //           },
-    //         });
-    //       },
-    //       error: function(jqXHR, textStatus, errorThrown) {
-    //         console.log(textStatus, errorThrown);
+    document.getElementById("button").onclick = function(){
+        console.log("running")
+        var fetchOptions = {
+           method : 'GET',
+           headers : {
+            "Content-Type" : "application/json"
+           }
+        }
+        fetch(url + '/', fetchOptions)
+        .then(response => {
+           if (response.status !== 200) {
+           console.log(errorMsg);
+           return;
+           }
+           response.json().then(data => {
+                data.forEach((c) => {
+                    var img = document.createElement("img")
+                    img.src = "data:image/png;base64data:image/png;base64, " + c.data
+                    document.getElementById("body").appendChild(img)
+                })
+           })
+        })
+    }
+
   </script>
 </body>
